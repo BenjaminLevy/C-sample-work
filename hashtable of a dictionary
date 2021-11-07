@@ -1,0 +1,142 @@
+// Implements a dictionary's functionality
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+// Allows strcasecmp
+#include <strings.h>
+// Allows sleep()
+#include <unistd.h>
+// Allows tolower to make all words put into the hash funciton lower case
+#include <ctype.h>
+
+#include "dictionary.h"
+
+// Counts words in given dictionary
+int wordCount = 0;
+
+// Represents a node in a hash table
+typedef struct node
+{
+    char word[LENGTH + 1];
+    struct node *next;
+}
+node;
+
+// Number of buckets in hash table CHANGED
+const unsigned int N = 60000;
+
+// Hash table
+node *table[N];
+
+// Returns true if word is in dictionary else false
+bool check(const char *word)
+{
+    int place = hash(word);
+    node *tmpG = table[place];
+    while (tmpG != NULL)
+    {
+       if(strcasecmp(word, tmpG->word) == 0)
+            {
+                return true;
+            }
+        tmpG = tmpG->next;
+    }
+    if(0) //this turns off everthing within if set to 0. setting to 1 will turn back on.
+    {
+        {
+            if(strcasecmp(word, tmpG->word) == 0)
+            {
+                return true;
+            }
+        }
+    }
+        return false;
+}
+
+// Hashes word to a number
+unsigned int hash(const char *word)
+{
+    // djb2 hash. source: http://www.cse.yorku.ca/~oz/hash.html
+  unsigned long hash = 5381;
+    int c;
+
+    while ((c = *word++))
+    {
+       hash = ((hash << 5) + hash) + tolower(c);
+    }
+    return hash % N;
+}
+
+
+// Loads dictionary into memory, returning true if successful else false
+bool load(const char *dictionary)
+{
+
+    char wordString[LENGTH + 1];
+    
+    FILE *dictPointer = fopen(dictionary, "r");
+    
+    while (fscanf(dictPointer, "%s", wordString) != EOF)
+    {
+        node *n = malloc(sizeof(node));
+        n->next = NULL;
+        if (n == NULL)
+        {
+            return false;
+        }
+        strcpy(n->word, wordString);
+        int place = hash(wordString);
+        if (table[place] == NULL)
+        {
+            table[place] = n;
+        }
+        else
+        {
+            n->next = table[place];
+            table[place] = n;
+        }
+        wordCount++;
+
+    if(0)
+    {
+    for(int i=0; i < N; i++)
+    {
+        int nodeCounter = 0;
+        for (node *tmp = table[i]; tmp !=NULL; tmp = tmp->next)
+        {
+            nodeCounter++;
+        }
+        if (i%10000==0)
+        {
+        printf("table[%i] contains %i buckets\n", i, nodeCounter);
+        }
+    }
+    }
+    fclose(dictPointer);
+    return true;
+}
+
+// Returns number of words in dictionary if loaded else 0 if not yet loaded
+unsigned int size(void)
+{
+
+    return wordCount;
+}
+
+// Unloads dictionary from memory, returning true if successful else false
+bool unload(void)
+{
+    for (int i = 0; i < N; i++)
+    {
+        node *ptr = table[i];
+        while (ptr != NULL)
+        {
+            node *next = ptr->next;
+            free(ptr);
+            ptr = next;
+        }
+    }
+    return true;
+}
