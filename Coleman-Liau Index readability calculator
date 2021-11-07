@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <cs50.h> // needed for get_string
+#include <ctype.h> //needed for isspace and isalpha functions
+#include <string.h> // needed for strlen
+#include <math.h> //needed for round function
+
+int count_letters(string x);
+int count_spaces(string x);
+int count_sentences(string x);
+float coleman_liau_index(float lett, float words, float sent);
+
+int main(void)
+{
+    string text = get_string("Text:");
+    //All this commented-out stuff was used to test earlier in development
+    //int count_letters(string text);
+    //printf ("%i letter(s)\n%i word(s)\n%i sentence(s) \n", count_letters(text), count_spaces(text), count_sentences(text));
+    //printf ("%f", coleman_liau_index(count_letters(text), count_spaces(text), count_sentences(text)));
+    if (coleman_liau_index(count_letters(text), count_spaces(text), count_sentences(text)) < 1)
+    {
+        printf("Before Grade 1\n");
+        return 0;
+    }
+    if (coleman_liau_index(count_letters(text), count_spaces(text), count_sentences(text)) > 16)
+    {
+       printf("Grade 16+\n");
+    }
+    else 
+    {
+        printf("Grade %.0f\n", coleman_liau_index(count_letters(text), count_spaces(text), count_sentences(text)));
+    }
+
+}
+
+int count_letters(string x)
+{
+    int count = 0;
+    for (int i = 0, length = strlen(x); i < length; i++)
+    {
+        if (isalpha(x[i]))
+        {
+            count ++;
+        }
+    }
+    return count;
+}
+
+int count_spaces(string x) //Used to find the number of words. Assumes every word is followed by a single space.
+{
+   int count = 1; //Starts at 1 bc first word doesn't begin with a sentence
+    for (int i = 0, length = strlen(x); i < length; i++)
+    {
+        if (isspace(x[i]))
+        {
+            count ++;
+        }
+    }
+    return count;
+}
+
+int count_sentences(string x)
+{
+    int count = 0;
+    for (int i = 0, length = strlen(x); i < length; i++)
+    {
+        if (x[i] == '.' || x[i] == '!' || x[i] == '?')
+        {
+            count ++;
+        }
+    }
+    return count;
+}
+
+float coleman_liau_index(float lett, float words, float sent)
+
+{
+    float L = lett / words * 100;
+    float S = sent / words * 100;
+    return (round(0.0588 * L - 0.296 * S - 15.8));
+    
+}
