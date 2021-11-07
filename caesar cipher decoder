@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <cs50.h>
+//  Allows strlen (measures number of chars in command line argument)
+#include <string.h>
+//  Allows isdigit, to check if a given char is a digit
+#include <ctype.h>
+// Allows atoi which converts a string into another type (like an int)
+#include <stdlib.h>
+
+bool isItAllDigits(string s);
+
+int main(int argc, string argv[])
+{
+
+
+// Insures user provides exactly one command line argument
+// argc checks number of words used when launching, including the name of the program
+
+    if (argc == 2)
+    {
+        int length = strlen(argv[1]);
+
+        for (int i = 0; i < length; i++)
+        {
+            if (isdigit(argv[1][i]))
+            {
+                int argv1Int = atoi(argv[1]);
+            }
+            else
+            {
+            printf("Usage: ./caesar key\n");
+            return 1;
+            }
+        }
+             printf("Success\n%s\n", argv[1]);
+    }
+    else
+    {
+        printf("Usage: ./caesar key\n");
+    }
+
+
+
+}
